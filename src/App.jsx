@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { useEffect, useState } from 'react'
 
@@ -6,7 +5,9 @@ const App = () => {
 
   const [ data, setData] =useState([])
 
-  const [input, setInput] = useState('')
+  const [name, setName] = useState('')
+  const [location, setLocation] = useState('')
+  const [price, setPrice] = useState('')
 
   useEffect( () => {
     
@@ -16,25 +17,25 @@ const App = () => {
 
   const handleFetch = () => {
 
-    fetch('http://localhost:8090')
+    fetch('https://nameless-wildwood-48294.herokuapp.com/')
     .then( (res) => { return res.json()})
     .then( (res) => {
       setData(res)
     })
   }
 
-  const handleDelete = (user) => {
+  const handleDelete = (golf) => {
     const fetchOptions = {
       method: 'DELETE',
       headers:{
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(user) 
+      body: JSON.stringify(golf) 
     }
 
-    fetch('http://localhost:8090/delete', fetchOptions )
+    fetch('https://nameless-wildwood-48294.herokuapp.com/delete', fetchOptions )
     .then( () => {
-      console.log('item deleted' + user.name)
+      console.log('item deleted' + golf.name)
       handleFetch()
     })
   }
@@ -48,25 +49,41 @@ const App = () => {
       headers:{
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({'name': input}) 
+      body: JSON.stringify({'name': name, 'location': location, 'price': price}) 
     }
 
-    fetch('http://localhost:8090/create', fetchOptions)
+    fetch('https://nameless-wildwood-48294.herokuapp.com/create', fetchOptions)
     .then(res => res.json())
     .then(res => {
       handleFetch();
     })
   }
 
+  const getJsxContent = data.map((doc, index) => {
+    return(
+        <div className='storedCourse' key={index}>
+          <p>{doc.name}</p>
+          <p>{doc.location}</p>
+          <p>{doc.price}</p>
+          <button onClick= {() => handleDelete(doc)}>Delete</button>
+        </div>
+      )
+    })
 
   return (
     <div className="App">
-      <h1>The Nology Team</h1>
-      {data.map(doc => <p>{doc.name} <button onClick= {() => handleDelete(doc)}>Delete</button></p> )}
-      <form>   
-        <label>Team Member Name </label>
-        <input type='text' onChange={(e) => setInput(e.target.value)}/>
-        <button onClick={handleSubmit}>Create</button>
+      <h1>Add your Dream Golf Courses</h1>
+      {getJsxContent}
+      <form>        
+        <fieldset> 
+          <label>Name </label>
+          <input type='text' onChange={(e) => setName(e.target.value)}/>
+          <label>Location </label>
+          <input type='text' onChange={(e) => setLocation(e.target.value)}/>
+          <label>Price </label>
+          <input type='text' onChange={(e) => setPrice(e.target.value)}/>
+        </fieldset>  
+        <button className='createBtn' onClick={handleSubmit}>Create</button>
       </form>
     </div>
   );
